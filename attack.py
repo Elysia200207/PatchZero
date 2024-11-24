@@ -3,7 +3,7 @@ import os
 import json
 from torchvision.utils import save_image
 
-class PatchAttack:
+class PatchAttack_save:
     def __init__(self, model, patch_size, step_size, eps, steps, position='uniform', mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
         '''
         model: nn.Module, the model to attack

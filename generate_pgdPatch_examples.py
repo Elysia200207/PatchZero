@@ -14,7 +14,7 @@ from tqdm import tqdm
 from torchvision.utils import save_image
 import json
 import torch
-from attack import PatchAttack
+from attack import PatchAttack_save
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 a = 0
@@ -88,16 +88,16 @@ def main():
                                     ])
             
     # 加载数据集
-    dataset = VOCDetection('/gpfs/hulab/huangyifan/datasets', year='2007', image_set='train', download=False, transform=data_augmentation)
-    # dataset_2012_train = VOCDetection('/gpfs/hulab/huangyifan/datasets', year='2012', image_set='train', download=False, transform=data_augmentation)
+    dataset = VOCDetection('/path/to/VOCdataset', year='2007', image_set='train', download=False, transform=data_augmentation)
+    # dataset_2012_train = VOCDetection('/path/to/VOCdataset', year='2012', image_set='train', download=False, transform=data_augmentation)
     # dataset = torch.utils.data.ConcatDataset([dataset_2007_train, dataset_2012_train])
-    dataset_test = VOCDetection('/gpfs/hulab/huangyifan/datasets', year='2007', image_set='val', download=True, transform=data_augmentation)
+    dataset_test = VOCDetection('/path/to/VOCdataset', year='2007', image_set='val', download=True, transform=data_augmentation)
 
     data_loader = DataLoader(dataset, batch_size=16, shuffle=True, num_workers=4, collate_fn=lambda x: tuple(zip(*x)))
     data_loader_test = DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=4, collate_fn=lambda x: tuple(zip(*x)))
 
 
-    model_path = '/home/huangyifan/ssd/ICLR_rebuttal/patchZero/best_fasterrcnn.pth'
+    model_path = '/path/to/pt/best_fasterrcnn.pth'
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=False)
     num_classes = 21
     in_features = model.roi_heads.box_predictor.cls_score.in_features
@@ -109,7 +109,7 @@ def main():
 
 
     model.to(device)
-    atk = PatchAttack(model, patch_size=120, step_size=0.1, eps=0.3, steps=100)
+    atk = PatchAttack_save(model, patch_size=120, step_size=0.1, eps=0.3, steps=100)
 
     for i, (images, targets) in enumerate(tqdm(data_loader, desc=f"generate example:")):
         targets = [{k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in t.items()} for t in targets]

@@ -132,8 +132,8 @@ def train(batch_size, models_path, backend, snapshot, frcnn_path, start_lr, alph
         transforms.ToTensor(),
         # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
-    dataset7 = CustomDataset(root_dir='/home/huangyifan/ssd/ICLR_rebuttal/patchZero/adv_examples2007', split='train', transform=transform, mode = 'clean')
-    dataset12 = CustomDataset(root_dir='/home/huangyifan/ssd/ICLR_rebuttal/patchZero/adv_examples2012', split='train', transform=transform, mode = 'clean')
+    dataset7 = CustomDataset(root_dir='./adv_examples2007', split='train', transform=transform, mode = 'clean')
+    dataset12 = CustomDataset(root_dir='./adv_examples2012', split='train', transform=transform, mode = 'clean')
     dataset = ConcatDataset([dataset7, dataset12])
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4, collate_fn=collate_fn)
     # train_loader, class_weights, n_images = None, None, None
@@ -161,10 +161,10 @@ def train(batch_size, models_path, backend, snapshot, frcnn_path, start_lr, alph
         
 if __name__ == '__main__':
     batch_size = 4
-    models_path = '/home/huangyifan/ssd/ICLR_rebuttal/patchZero/pspnet/fineTune'
+    models_path = '/path/to/pt/pspnet/fineTune'
     backend = 'resnet50'
-    snapshot = '/home/huangyifan/ssd/ICLR_rebuttal/patchZero/pspnet/PSPNet_5'
-    frcnn_path = '/home/huangyifan/ssd/ICLR_rebuttal/patchZero/best_fasterrcnn.pth'
+    snapshot = '/path/to/pt/pspnet/PSPNet_5'
+    frcnn_path = '/path/to/pt/best_fasterrcnn.pth'
     start_lr = 0.0001
     alpha = 1.0
     milestones = '10,20,30'

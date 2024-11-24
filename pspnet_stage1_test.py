@@ -106,8 +106,7 @@ def build_network(snapshot, backend):
 
 
 @click.command()
-@click.option('--data-path', type=str, default='/home/huangyifan/ssd/ICLR_rebuttal/patchZero/adv_examples2007', help='Path to dataset folder')
-@click.option('--models-path', type=str,default='/home/huangyifan/ssd/ICLR_rebuttal/patchZero/pspnet', help='Path for storing model snapshots')
+@click.option('--models-path', type=str,default='/path/to/pt/pspnet', help='Path for storing model snapshots')
 @click.option('--backend', type=str, default='resnet50', help='Feature extractor')
 @click.option('--snapshot', type=str, default=None, help='Path to pretrained weights')
 @click.option('--crop_x', type=int, default=256, help='Horizontal random crop size')
@@ -118,17 +117,16 @@ def build_network(snapshot, backend):
 @click.option('--gpu', type=str, default='4', help='List of GPUs for parallel training, e.g. 0,1,2,3')
 @click.option('--start-lr', type=float, default=0.0001)
 @click.option('--milestones', type=str, default='10,20,30', help='Milestones for LR decreasing')
-def eval(data_path, models_path, backend, snapshot, crop_x, crop_y, batch_size, alpha, epochs, start_lr, milestones, gpu):
+def eval(models_path, backend, snapshot, crop_x, crop_y, batch_size, alpha, epochs, start_lr, milestones, gpu):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
     net, starting_epoch = build_network('/home/huangyifan/ssd/ICLR_rebuttal/patchZero/pspnet/PSPNet_5', backend)
-    data_path = os.path.abspath(os.path.expanduser(data_path))
     
     transform = transforms.Compose([
         transforms.ToTensor(),
         # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
     
-    dataset = CustomDataset(root_dir='/home/huangyifan/ssd/ICLR_rebuttal/patchZero/adv_examples2007', split='test', transform=transform)
+    dataset = CustomDataset(root_dir='./adv_examples2007', split='test', transform=transform)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
     net.train()
     for x, y, y_cls in tqdm(dataloader, total=len(dataset) // batch_size + 1):

@@ -84,10 +84,10 @@ data_augmentation = transforms.Compose([
 
 
 # 加载数据集
-dataset_2007_train = VOCDetection('/gpfs/hulab/huangyifan/datasets', year='2007', image_set='train', download=False, transform=data_augmentation)
-dataset_2012_train = VOCDetection('/gpfs/hulab/huangyifan/datasets', year='2012', image_set='train', download=False, transform=data_augmentation)
+dataset_2007_train = VOCDetection('/path/to/VOCdataset', year='2007', image_set='train', download=False, transform=data_augmentation)
+dataset_2012_train = VOCDetection('/path/to/VOCdataset', year='2012', image_set='train', download=False, transform=data_augmentation)
 dataset = torch.utils.data.ConcatDataset([dataset_2007_train, dataset_2012_train])
-dataset_test = VOCDetection('/gpfs/hulab/huangyifan/datasets', year='2007', image_set='val', download=True, transform=data_augmentation)
+dataset_test = VOCDetection('/path/to/VOCdataset', year='2007', image_set='val', download=True, transform=data_augmentation)
 
 data_loader = DataLoader(dataset, batch_size=8, shuffle=True, num_workers=4, collate_fn=lambda x: tuple(zip(*x)))
 data_loader_test = DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=4, collate_fn=lambda x: tuple(zip(*x)))
@@ -110,15 +110,15 @@ def calculate_ap50(outputs, targets):
     return ap50 / len(outputs)
 
 # 加载预训练模型并修改分类器
-model_path = '/home/huangyifan/ssd/ICLR_rebuttal/patchZero/best_fasterrcnn61.pth'
+# model_path = '/path/to/pt/best_fasterrcnn.pth'
 
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=False)
+model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
 
 num_classes = 21
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
-model.load_state_dict(torch.load(model_path))
+#model.load_state_dict(torch.load(model_path))
 # 定义优化器和学习率调度器
 params = [p for p in model.parameters() if p.requires_grad]
 optimizer = torch.optim.Adam(params, lr=1e-6, weight_decay=0.0001)
@@ -181,6 +181,6 @@ for epoch in range(num_epochs):
         best_ap50 = ap50
         best_epoch = epoch
         print("Replace checkpoint!")
-        torch.save(model.state_dict(), "best_fasterrcnn.pth")
+        torch.save(model.state_dict(), "path/to/pt/best_fasterrcnn.pth")
 
 print("Training complete!")
